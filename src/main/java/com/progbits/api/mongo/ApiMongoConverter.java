@@ -95,7 +95,7 @@ public class ApiMongoConverter {
                 case DATE_TIME -> {
                     Long lValue = entry.getValue().asDateTime().getValue();
 
-                    OffsetDateTime nDt = OffsetDateTime.ofInstant(Instant.ofEpochMilli(lValue), ZoneId.systemDefault());
+                    OffsetDateTime nDt = OffsetDateTime.ofInstant(Instant.ofEpochSecond(lValue), ZoneId.of("UTC"));
 
                     ret.setDateTime(entry.getKey(), nDt);
                 }
