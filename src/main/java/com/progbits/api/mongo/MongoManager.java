@@ -6,6 +6,7 @@ import org.bson.BsonDocument;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoException;
 import com.mongodb.ServerApi;
 import com.mongodb.ServerApiVersion;
 import com.mongodb.client.FindIterable;
@@ -24,6 +25,7 @@ import com.progbits.api.model.ApiObjectUtils;
 import com.progbits.api.utils.service.ApiInstance;
 import com.progbits.api.utils.service.ApiService;
 import org.bson.BsonInt32;
+import org.bson.Document;
 
 /**
  *
@@ -78,6 +80,23 @@ public class MongoManager implements ApiService, AutoCloseable {
     
     public MongoCollection<BsonDocument> getCollection(String collection) {
         return mongoDb.getCollection(collection, BsonDocument.class);
+    }
+    
+    public boolean status() throws ApiException {
+        boolean bRet = false;
+        
+        Document doc = new Document();
+        doc.put("ping", 1);
+
+        try {
+            mongoDb.runCommand(doc);
+
+            bRet = true;
+        } catch (MongoException ex) {
+            // Nothing really to do here
+        }
+        
+        return bRet;
     }
     
     public ApiObject insert(String collection, ApiObject subject) throws ApiException {
