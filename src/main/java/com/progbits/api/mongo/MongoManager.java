@@ -82,7 +82,7 @@ public class MongoManager implements ApiService, AutoCloseable {
         return mongoDb.getCollection(collection, BsonDocument.class);
     }
     
-    public boolean status() throws ApiException {
+    public boolean status() {
         boolean bRet = false;
         
         Document doc = new Document();
