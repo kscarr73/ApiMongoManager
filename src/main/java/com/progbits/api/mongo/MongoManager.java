@@ -100,6 +100,10 @@ public class MongoManager implements ApiService, AutoCloseable {
     }
     
     public ApiObject insert(String collection, ApiObject subject) throws ApiException {
+        return insert(collection, subject, true);
+    }
+    
+    public ApiObject insert(String collection, ApiObject subject, boolean returnInserted) throws ApiException {
         ApiObject resp = null;
 
         MongoCollection<BsonDocument> col = mongoDb.getCollection(collection, BsonDocument.class);
@@ -119,7 +123,13 @@ public class MongoManager implements ApiService, AutoCloseable {
                 objInsert.getStringArray("_id.$in").add(entry.asObjectId().getValue().toHexString());
             }
             
-            resp = find(collection, objInsert);
+            if (returnInserted) {
+                resp = find(collection, objInsert);
+            } else {
+                resp = new ApiObject();
+                
+                resp.put("created_ids", objInsert.getStringArray("_id.$in"));
+            }
         } else {
             BsonDocument bsonDoc = ApiMongoConverter.toBson(subject);
 
@@ -129,7 +139,14 @@ public class MongoManager implements ApiService, AutoCloseable {
             
             objInsert.setString(FIELD_ID, res.getInsertedId().asObjectId().getValue().toHexString());
             
-            resp = find(collection, objInsert);
+            if (returnInserted) {
+                resp = find(collection, objInsert);
+            } else {
+                resp = new ApiObject();
+                
+                resp.createStringArray("created_ids");
+                resp.getStringArray("created_ids").add(objInsert.getString(FIELD_ID));
+            }
         }
 
         return resp;
